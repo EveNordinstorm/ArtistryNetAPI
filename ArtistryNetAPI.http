@@ -1,0 +1,6 @@
+@ArtistryNetAPI_HostAddress = http://localhost:5192
+
+GET {{ArtistryNetAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
