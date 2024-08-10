@@ -50,8 +50,16 @@ public class AccountController : ControllerBase
             return Unauthorized(new { Message = "Invalid credentials" });
         }
 
+        var profilePhotoUrl = Url.Content($"~/images/profiles/{Path.GetFileName(user.ProfilePhoto)}");
+
         var token = GenerateJwtToken(user);
-        return Ok(new { Token = token });
+        return Ok(new
+        {
+            Token = token,
+            Username = user.UserName,
+            Email = user.Email,
+            ProfilePhoto = profilePhotoUrl
+        });
     }
 
     private string GenerateJwtToken(ApplicationUser user)

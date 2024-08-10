@@ -5,7 +5,7 @@
         public string Username { get; set; } = string.Empty;
         public string ProfilePhoto { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string? ImagePath { get; set; }
+        public IFormFile? ImagePath { get; set; }
         public string UserId { get; set; } = string.Empty;
     }
 }

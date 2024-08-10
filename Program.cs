@@ -72,6 +72,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("AllowLocalhost5173");
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 

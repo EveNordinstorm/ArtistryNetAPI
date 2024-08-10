@@ -33,7 +33,7 @@ public class PostsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreatePost([FromForm] PostModel model, IFormFile image)
+    public async Task<IActionResult> CreatePost([FromForm] PostModel model)
     {
         var userId = GetUserIdFromToken();
         if (model.UserId != userId)
@@ -50,9 +50,16 @@ public class PostsController : ControllerBase
             UserId = model.UserId
         };
 
-        await _postService.CreatePostAsync(post, image);
-        return Ok(new { Message = "Post created successfully" });
+        await _postService.CreatePostAsync(post, model.ImagePath);
+
+        var imageUrl = Url.Content("~/images/posts/" + model.ImagePath.FileName);
+
+        return Ok(new
+        {
+            Message = "Post created successfully",
+            ImageUrl = imageUrl // Return the image URL
+        });
     }
 
-    // Implement other actions such as Get, Update, Delete, etc. using the _postService
+    // Can add Get, Update, Delete, etc. using the _postService
 }
