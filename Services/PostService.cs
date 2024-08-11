@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System;
 
 namespace ArtistryNetAPI.Services
 {
@@ -14,10 +15,11 @@ namespace ArtistryNetAPI.Services
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
 
+        // Constructor to inject the dependencies
         public PostService(ApplicationDbContext context, IWebHostEnvironment environment)
         {
-            _context = context;
-            _environment = environment;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
 
         public async Task<IEnumerable<Post>> GetAllPostsAsync()
@@ -32,33 +34,55 @@ namespace ArtistryNetAPI.Services
 
         public async Task CreatePostAsync(Post post, IFormFile image)
         {
-            // Handle file upload
-            string postImagePath = string.Empty;
             if (image != null)
             {
-                string uploadsFolder = Path.Combine(_environment.WebRootPath, "images/posts");
-                Directory.CreateDirectory(uploadsFolder); // Ensure the directory exists
-
-                string uniqueFileName = Guid.NewGuid().ToString() + "_" + image.FileName; // Use a unique name
-                postImagePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                using (var fileStream = new FileStream(postImagePath, FileMode.Create))
+                try
                 {
-                    await image.CopyToAsync(fileStream);
-                }
+                    string uploadsFolder = Path.Combine(_environment.WebRootPath, "images/posts");
+                    Directory.CreateDirectory(uploadsFolder); // Ensure the directory exists
 
-                // Set the image path to the Post object (relative path)
-                post.ImagePath = Path.Combine("images/posts", uniqueFileName);
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(image.FileName);
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await image.CopyToAsync(fileStream);
+                    }
+
+                    // Store only the file name in the database
+                    post.ImageUrl = uniqueFileName;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error saving image: {ex.Message}");
+                    throw; // Optionally, re-throw the exception to propagate it
+                }
             }
 
-            _context.Posts.Add(post);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Posts.Add(post);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving post: {ex.Message}");
+                throw; // Optionally, re-throw the exception to propagate it
+            }
         }
 
         public async Task UpdatePostAsync(Post post)
         {
-            _context.Posts.Update(post);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Posts.Update(post);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating post: {ex.Message}");
+                throw; // Optionally, re-throw the exception to propagate it
+            }
         }
 
         public async Task DeletePostAsync(int id)
@@ -66,9 +90,19 @@ namespace ArtistryNetAPI.Services
             var post = await _context.Posts.FindAsync(id);
             if (post != null)
             {
-                _context.Posts.Remove(post);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    _context.Posts.Remove(post);
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error deleting post: {ex.Message}");
+                    throw; // Optionally, re-throw the exception to propagate it
+                }
             }
         }
     }
+
 }
+

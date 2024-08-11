@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using ArtistryNetAPI.Entities;
-using ArtistryNetAPI.Models;
-using ArtistryNetAPI.Services;
 using ArtistryNetAPI.Interfaces;
-using System.IdentityModel.Tokens.Jwt;
+using ArtistryNetAPI.Models;
+using ArtistryNetAPI.Utilities;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -18,48 +19,71 @@ public class PostsController : ControllerBase
         _postService = postService;
     }
 
-    private string GetUserIdFromToken()
-    {
-        var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
-        if (authHeader.StartsWith("Bearer "))
-        {
-            var token = authHeader.Substring("Bearer ".Length).Trim();
-            var jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
-            var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "nameid"); // or "sub" depending on your token
-            return userIdClaim?.Value;
-        }
-
-        return null;
-    }
-
     [HttpPost]
-    public async Task<IActionResult> CreatePost([FromForm] PostModel model)
+    public async Task<IActionResult> CreatePost([FromForm] PostModel model, [FromForm] IFormFile imageUrl)
     {
-        var userId = GetUserIdFromToken();
-        if (model.UserId != userId)
+        try
         {
-            return Unauthorized(new { Message = "Invalid user" });
+            var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
+
+            if (userIdFromToken == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            if (userIdFromToken != model.UserId)
+            {
+                return Unauthorized(new { message = "Invalid user" });
+            }
+
+            var post = new Post
+            {
+                Username = model.Username,
+                ProfilePhoto = model.ProfilePhoto,
+                PostDateTime = DateTime.Now,
+                Description = model.Description
+            };
+
+            await _postService.CreatePostAsync(post, imageUrl);
+
+            var imageUrlResult = Url.Content($"~/images/posts/{post.ImageUrl}");
+
+            return Ok(new
+            {
+                Message = "Post created successfully",
+                ImageUrl = imageUrlResult
+            });
         }
-
-        var post = new Post
+        catch (Exception ex)
         {
-            Username = model.Username,
-            ProfilePhoto = model.ProfilePhoto,
-            PostDateTime = DateTime.Now,
-            Description = model.Description,
-            UserId = model.UserId
-        };
-
-        await _postService.CreatePostAsync(post, model.ImagePath);
-
-        var imageUrl = Url.Content("~/images/posts/" + model.ImagePath.FileName);
-
-        return Ok(new
-        {
-            Message = "Post created successfully",
-            ImageUrl = imageUrl // Return the image URL
-        });
+            Console.WriteLine($"Error creating post: {ex.Message}");
+            return StatusCode(500, "An error occurred while creating the post.");
+        }
     }
 
-    // Can add Get, Update, Delete, etc. using the _postService
+    [HttpGet]
+    public async Task<IActionResult> GetPosts()
+    {
+        try
+        {
+            var posts = await _postService.GetAllPostsAsync();
+
+            var postDtos = posts.Select(post => new
+            {
+                post.Id,
+                post.Username,
+                post.ProfilePhoto,
+                post.PostDateTime,
+                post.Description,
+                ImageUrl = Url.Content($"~/images/posts/{post.ImageUrl}")
+            });
+
+            return Ok(postDtos);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving posts: {ex.Message}");
+            return StatusCode(500, "An error occurred while retrieving the posts.");
+        }
+    }
 }

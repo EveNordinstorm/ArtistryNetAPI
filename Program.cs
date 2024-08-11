@@ -1,12 +1,17 @@
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using ArtistryNetAPI.Data;
-using ArtistryNetAPI.Entities;
 using ArtistryNetAPI.Interfaces;
 using ArtistryNetAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ArtistryNetAPI.Entities;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +21,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalhost5173",
         policy =>
         {
-            policy.SetIsOriginAllowed(origin => true)
+            policy.WithOrigins("http://localhost:5173") // Allow only the specific origin
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -59,18 +64,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
-
 var app = builder.Build();
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    // No HSTS in non-HTTPS environment
+}
 
-app.UseHttpsRedirection();
+// Middleware configuration
 app.UseCors("AllowLocalhost5173");
 app.UseStaticFiles();
 app.UseAuthentication();

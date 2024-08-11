@@ -20,7 +20,7 @@ namespace ArtistryNetAPI.Entities
         [Required]
         public string Description { get; set; } = string.Empty;
 
-        public string? ImagePath { get; set; }
+        public string? ImageUrl { get; set; }
 
         [Required]
         public string UserId { get; set; } = string.Empty;
