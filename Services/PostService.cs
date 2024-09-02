@@ -15,7 +15,6 @@ namespace ArtistryNetAPI.Services
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
 
-        // Constructor to inject the dependencies
         public PostService(ApplicationDbContext context, IWebHostEnvironment environment)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -24,40 +23,37 @@ namespace ArtistryNetAPI.Services
 
         public async Task<IEnumerable<Post>> GetAllPostsAsync()
         {
-            return await _context.Posts.ToListAsync();
+            return await _context.Posts
+                .Include(p => p.User)
+                .ToListAsync();
         }
 
         public async Task<Post> GetPostByIdAsync(int id)
         {
-            return await _context.Posts.FindAsync(id);
+            return await _context.Posts
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task CreatePostAsync(Post post, IFormFile image)
+        public async Task CreatePostAsync(Post post, IFormFile image, string userId)
         {
             if (image != null)
             {
-                try
+                string uploadsFolder = Path.Combine(_environment.WebRootPath, "images/posts");
+                Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(image.FileName);
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    string uploadsFolder = Path.Combine(_environment.WebRootPath, "images/posts");
-                    Directory.CreateDirectory(uploadsFolder); // Ensure the directory exists
-
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(image.FileName);
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await image.CopyToAsync(fileStream);
-                    }
-
-                    // Store only the file name in the database
-                    post.ImageUrl = uniqueFileName;
+                    await image.CopyToAsync(fileStream);
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error saving image: {ex.Message}");
-                    throw; // Optionally, re-throw the exception to propagate it
-                }
+
+                post.ImageUrl = uniqueFileName;
             }
+
+            post.UserId = userId;
 
             try
             {
@@ -67,7 +63,7 @@ namespace ArtistryNetAPI.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error saving post: {ex.Message}");
-                throw; // Optionally, re-throw the exception to propagate it
+                throw;
             }
         }
 
@@ -81,7 +77,7 @@ namespace ArtistryNetAPI.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error updating post: {ex.Message}");
-                throw; // Optionally, re-throw the exception to propagate it
+                throw;
             }
         }
 
@@ -98,11 +94,9 @@ namespace ArtistryNetAPI.Services
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error deleting post: {ex.Message}");
-                    throw; // Optionally, re-throw the exception to propagate it
+                    throw;
                 }
             }
         }
     }
-
 }
-

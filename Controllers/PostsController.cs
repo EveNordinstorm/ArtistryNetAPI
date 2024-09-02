@@ -1,22 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ArtistryNetAPI.Entities;
 using ArtistryNetAPI.Interfaces;
 using ArtistryNetAPI.Models;
 using ArtistryNetAPI.Utilities;
+using Microsoft.EntityFrameworkCore;
+using ArtistryNetAPI.Data;
 
 [Route("api/[controller]")]
 [ApiController]
 public class PostsController : ControllerBase
 {
     private readonly IPostService _postService;
+    private readonly ApplicationDbContext _context;
 
-    public PostsController(IPostService postService)
+    public PostsController(IPostService postService, ApplicationDbContext context)
     {
         _postService = postService;
+        _context = context;
     }
 
     [HttpPost]
@@ -31,20 +34,22 @@ public class PostsController : ControllerBase
                 return Unauthorized(new { message = "Invalid token" });
             }
 
-            if (userIdFromToken != model.UserId)
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userIdFromToken);
+            if (user == null)
             {
                 return Unauthorized(new { message = "Invalid user" });
             }
 
             var post = new Post
             {
-                Username = model.Username,
-                ProfilePhoto = model.ProfilePhoto,
                 PostDateTime = DateTime.Now,
-                Description = model.Description
+                Description = model.Description,
+                UserId = userIdFromToken,
+                Username = user.UserName,
+                ProfilePhoto = user.ProfilePhoto
             };
 
-            await _postService.CreatePostAsync(post, imageUrl);
+            await _postService.CreatePostAsync(post, imageUrl, userIdFromToken);
 
             var imageUrlResult = Url.Content($"~/images/posts/{post.ImageUrl}");
 
@@ -57,9 +62,14 @@ public class PostsController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"Error creating post: {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
             return StatusCode(500, "An error occurred while creating the post.");
         }
     }
+
 
     [HttpGet]
     public async Task<IActionResult> GetPosts()
@@ -71,9 +81,9 @@ public class PostsController : ControllerBase
             var postDtos = posts.Select(post => new
             {
                 post.Id,
-                post.Username,
-                post.ProfilePhoto,
-                post.PostDateTime,
+                Username = post.User?.UserName,
+                ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
+                PostDateTime = post.PostDateTime,
                 post.Description,
                 ImageUrl = Url.Content($"~/images/posts/{post.ImageUrl}")
             });
@@ -86,4 +96,45 @@ public class PostsController : ControllerBase
             return StatusCode(500, "An error occurred while retrieving the posts.");
         }
     }
+
+    [HttpGet("user")]
+    public async Task<IActionResult> GetUserPosts()
+    {
+        try
+        {
+            var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
+
+            if (userIdFromToken == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var posts = await _context.Posts
+                .Include(p => p.User)
+                .Where(p => p.UserId == userIdFromToken)
+                .ToListAsync();
+
+            var postDtos = posts.Select(post => new
+            {
+                post.Id,
+                Username = post.User?.UserName,
+                ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
+                PostDateTime = post.PostDateTime,
+                post.Description,
+                ImageUrl = Url.Content($"~/images/posts/{post.ImageUrl}")
+            });
+
+            return Ok(postDtos);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving user posts: {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
+            return StatusCode(500, "An error occurred while retrieving the user's posts.");
+        }
+    }
+
 }

@@ -58,7 +58,8 @@ public class AccountController : ControllerBase
             Token = token,
             Username = user.UserName,
             Email = user.Email,
-            ProfilePhoto = profilePhotoUrl
+            ProfilePhoto = profilePhotoUrl,
+            Bio = user.Bio
         });
     }
 

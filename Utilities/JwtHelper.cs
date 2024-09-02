@@ -11,6 +11,7 @@ namespace ArtistryNetAPI.Utilities
         {
             var authHeader = httpContext.Request.Headers["Authorization"].ToString();
             Console.WriteLine($"Authorization Header: {authHeader}");
+
             if (authHeader.StartsWith("Bearer "))
             {
                 var token = authHeader.Substring("Bearer ".Length).Trim();
@@ -19,7 +20,9 @@ namespace ArtistryNetAPI.Utilities
                 try
                 {
                     var jwtToken = tokenHandler.ReadJwtToken(token);
-                    var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+
+                    var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
                     Console.WriteLine($"User ID Claim: {userIdClaim?.Value}");
                     return userIdClaim?.Value;
                 }

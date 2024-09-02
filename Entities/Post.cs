@@ -5,25 +5,25 @@ namespace ArtistryNetAPI.Entities
 {
     public class Post
     {
-        [Key]
         public int Id { get; set; }
 
-        [Required]
+        public string UserId { get; set; } = string.Empty;
+
         public string Username { get; set; } = string.Empty;
 
-        [Required]
         public string ProfilePhoto { get; set; } = string.Empty;
 
-        [Required]
         public DateTime PostDateTime { get; set; }
 
-        [Required]
         public string Description { get; set; } = string.Empty;
 
         public string? ImageUrl { get; set; }
 
-        [Required]
-        public string UserId { get; set; } = string.Empty;
+        
         public ApplicationUser User { get; set; } = null!;
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public ICollection<Like> Likes { get; set; } = new List<Like>();
+        public ICollection<Share> Shares { get; set; } = new List<Share>();
+        public ICollection<Save> Saves { get; set; } = new List<Save>();
     }
 }
