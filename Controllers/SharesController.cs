@@ -125,7 +125,7 @@ public class SharesController : ControllerBase
                     share.Post.Id,
                     share.Post.Description,
                     ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
-                    PostDateTime = share.Post.PostDateTime.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                    PostDateTime = share.Post.PostDateTime,
                     Username = share.Post.Username,
                     ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}")
                 }
@@ -137,6 +137,43 @@ public class SharesController : ControllerBase
         {
             Console.WriteLine($"Error retrieving user shares: {ex.Message}");
             return StatusCode(500, "An error occurred while retrieving the user's shares.");
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllShares()
+    {
+        try
+        {
+            var shares = await _shareService.GetAllSharesAsync();
+
+            var shareDtos = shares.Select(share => new
+            {
+                share.Id,
+                share.PostId,
+                share.ShareDateTime,
+                Sharer = new
+                {
+                    Username = share.User?.Username,
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}")
+                },
+                OriginalPost = new
+                {
+                    share.Post.Id,
+                    share.Post.Description,
+                    ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
+                    PostDateTime = share.Post.PostDateTime,
+                    Username = share.Post.Username,
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}")
+                }
+            });
+
+            return Ok(shareDtos);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving all shares: {ex.Message}");
+            return StatusCode(500, "An error occurred while retrieving all shares.");
         }
     }
 }

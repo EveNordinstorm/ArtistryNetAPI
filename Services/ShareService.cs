@@ -49,5 +49,14 @@ namespace ArtistryNetAPI.Services
                     .ThenInclude(p => p.User)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Share>> GetAllSharesAsync()
+        {
+            return await _context.Shares
+                .Include(s => s.User)
+                .Include(s => s.Post)
+                    .ThenInclude(p => p.User)
+                .ToListAsync();
+        }
     }
 }
