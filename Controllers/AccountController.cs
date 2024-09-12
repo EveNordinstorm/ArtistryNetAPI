@@ -87,4 +87,37 @@ public class AccountController : ControllerBase
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetUserById(string id)
+    {
+        var user = await _userService.FindByIdAsync(id);
+        if (user == null)
+        {
+            return NotFound(new { Message = "User not found." });
+        }
+
+        var profilePhotoUrl = Url.Content($"~/images/profiles/{Path.GetFileName(user.ProfilePhoto)}");
+
+        return Ok(new
+        {
+            user.Id,
+            user.Username,
+            user.Email,
+            ProfilePhoto = profilePhotoUrl,
+            user.Bio,
+        });
+    }
+
+    [HttpGet("getUserIdByUsername/{username}")]
+    public async Task<IActionResult> GetUserIdByUsername(string username)
+    {
+        var user = await _userService.FindByUsernameAsync(username);
+        if (user == null)
+        {
+            return NotFound(new { Message = "User not found." });
+        }
+
+        return Ok(new { Id = user.Id });
+    }
 }

@@ -51,11 +51,14 @@ namespace ArtistryNetAPI.Services
             return await _userManager.FindByNameAsync(username);
         }
 
+        public async Task<ApplicationUser> FindByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
+
         public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
         {
             return await _userManager.CheckPasswordAsync(user, password);
         }
-
-        // Implement other user-related methods as needed
     }
 }

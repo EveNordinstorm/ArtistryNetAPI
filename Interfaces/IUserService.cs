@@ -9,7 +9,7 @@ namespace ArtistryNetAPI.Interfaces
     {
         Task<IdentityResult> RegisterUserAsync(RegisterModel model);
         Task<ApplicationUser> FindByUsernameAsync(string username);
+        Task<ApplicationUser> FindByIdAsync(string userId);
         Task<bool> CheckPasswordAsync(ApplicationUser user, string password);
-        // Add other user-related methods as needed
     }
 }
