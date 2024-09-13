@@ -7,6 +7,8 @@ using ArtistryNetAPI.Interfaces;
 using ArtistryNetAPI.Utilities;
 using ArtistryNetAPI.Models;
 using ArtistryNetAPI.Services;
+using ArtistryNetAPI.Dto;
+using Microsoft.Extensions.Hosting;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -110,28 +112,30 @@ public class SharesController : ControllerBase
 
             var shares = await _shareService.GetSharesByUserAsync(userIdFromToken);
 
-            var shareDtos = shares.Select(share => new
+            var sharesDtos = shares.Select(share => new SharesDto
             {
-                share.Id,
-                share.PostId,
-                share.ShareDateTime,
-                Sharer = new
+                Id = share.Id,
+                PostId = share.PostId,
+                ShareDateTime = share.ShareDateTime,
+                Sharer = new SharerDto
                 {
                     Username = share.User?.Username,
-                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}")
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}"),
+                    UserId = share.UserId
                 },
-                OriginalPost = new
+                OriginalPost = new OriginalPostDto
                 {
-                    share.Post.Id,
-                    share.Post.Description,
+                    Id = share.Post.Id,
+                    Description = share.Post.Description,
                     ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
                     PostDateTime = share.Post.PostDateTime,
                     Username = share.Post.Username,
-                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}")
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
+                    UserId = share.Post.UserId
                 }
             });
 
-            return Ok(shareDtos);
+            return Ok(sharesDtos);
         }
         catch (Exception ex)
         {
@@ -147,28 +151,30 @@ public class SharesController : ControllerBase
         {
             var shares = await _shareService.GetAllSharesAsync();
 
-            var shareDtos = shares.Select(share => new
+            var sharesDto = shares.Select(share => new SharesDto
             {
-                share.Id,
-                share.PostId,
-                share.ShareDateTime,
-                Sharer = new
+                Id = share.Id,
+                PostId = share.PostId,
+                ShareDateTime = share.ShareDateTime,
+                Sharer = new SharerDto
                 {
                     Username = share.User?.Username,
-                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}")
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}"),
+                    UserId = share.UserId
                 },
-                OriginalPost = new
+                OriginalPost = new OriginalPostDto
                 {
-                    share.Post.Id,
-                    share.Post.Description,
+                    Id = share.Post.Id,
+                    Description = share.Post.Description,
                     ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
                     PostDateTime = share.Post.PostDateTime,
                     Username = share.Post.Username,
-                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}")
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
+                    UserId = share.Post.UserId
                 }
             });
 
-            return Ok(shareDtos);
+            return Ok(sharesDto);
         }
         catch (Exception ex)
         {

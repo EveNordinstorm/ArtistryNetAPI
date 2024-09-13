@@ -9,6 +9,7 @@ namespace ArtistryNetAPI.Entities
         public string Bio { get; set; } = string.Empty;
 
         public ICollection<Post> Posts { get; set; } = new List<Post>();
+        public ICollection<Product> Products { get; set; } = new List<Product>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<Like> Likes { get; set; } = new List<Like>();
         public ICollection<Share> Shares { get; set; } = new List<Share>();

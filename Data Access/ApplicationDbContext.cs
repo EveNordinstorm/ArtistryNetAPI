@@ -13,6 +13,7 @@ namespace ArtistryNetAPI.Data
         }
 
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<Like> Likes { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -26,6 +27,11 @@ namespace ArtistryNetAPI.Data
             modelBuilder.Entity<Post>()
             .HasOne(p => p.User)
             .WithMany(u => u.Posts)
+            .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<Product>()
+            .HasOne(p => p.User)
+            .WithMany(u => u.Products)
             .HasForeignKey(p => p.UserId);
 
             modelBuilder.Entity<Like>()

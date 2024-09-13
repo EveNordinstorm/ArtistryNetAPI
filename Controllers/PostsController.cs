@@ -8,6 +8,7 @@ using ArtistryNetAPI.Models;
 using ArtistryNetAPI.Utilities;
 using Microsoft.EntityFrameworkCore;
 using ArtistryNetAPI.Data;
+using ArtistryNetAPI.Dto;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -78,14 +79,15 @@ public class PostsController : ControllerBase
         {
             var posts = await _postService.GetAllPostsAsync();
 
-            var postDtos = posts.Select(post => new
+            var postDtos = posts.Select(post => new PostDto
             {
-                post.Id,
+                Id = post.Id,
                 Username = post.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
                 PostDateTime = post.PostDateTime,
-                post.Description,
-                ImageUrl = Url.Content($"~/images/posts/{post.ImageUrl}")
+                Description = post.Description,
+                ImageUrl = Url.Content($"~/images/posts/{post.ImageUrl}"),
+                UserId = post.UserId
             });
 
             return Ok(postDtos);
@@ -114,14 +116,15 @@ public class PostsController : ControllerBase
                 .Where(p => p.UserId == userIdFromToken)
                 .ToListAsync();
 
-            var postDtos = posts.Select(post => new
+            var postDtos = posts.Select(post => new PostDto
             {
-                post.Id,
+                Id = post.Id,
                 Username = post.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
                 PostDateTime = post.PostDateTime,
-                post.Description,
-                ImageUrl = Url.Content($"~/images/posts/{post.ImageUrl}")
+                Description = post.Description,
+                ImageUrl = Url.Content($"~/images/posts/{post.ImageUrl}"),
+                UserId = post.UserId
             });
 
             return Ok(postDtos);
