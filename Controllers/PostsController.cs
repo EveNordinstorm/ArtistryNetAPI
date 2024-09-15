@@ -140,4 +140,39 @@ public class PostsController : ControllerBase
         }
     }
 
+    [HttpGet("getPostsByUsername/{username}")]
+    public async Task<IActionResult> GetPostsByUsernameAsync(string username)
+    {
+        try
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            var posts = await _context.Posts
+                .Include(p => p.User)
+                .Where(p => p.UserId == user.Id)
+                .ToListAsync();
+
+            var postDtos = posts.Select(post => new PostDto
+            {
+                Id = post.Id,
+                Username = post.User?.UserName,
+                ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
+                PostDateTime = post.PostDateTime,
+                Description = post.Description,
+                ImageUrl = Url.Content($"~/images/posts/{post.ImageUrl}"),
+                UserId = post.UserId
+            });
+
+            return Ok(postDtos);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving posts by username: {ex.Message}");
+            return StatusCode(500, "An error occurred while retrieving the posts.");
+        }
+    }
 }

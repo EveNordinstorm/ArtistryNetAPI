@@ -35,6 +35,14 @@ namespace ArtistryNetAPI.Services
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task<IEnumerable<Post>> GetPostsByUsernameAsync(string username)
+        {
+            return await _context.Posts
+                .Include(p => p.User)
+                .Where(p => p.User.UserName == username)
+                .ToListAsync();
+        }
+
         public async Task CreatePostAsync(Post post, IFormFile image, string userId)
         {
             if (image != null)

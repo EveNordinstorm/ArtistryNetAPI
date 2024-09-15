@@ -23,6 +23,15 @@ namespace ArtistryNetAPI.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<IEnumerable<Share>> GetAllSharesAsync()
+        {
+            return await _context.Shares
+                .Include(s => s.User)
+                .Include(s => s.Post)
+                    .ThenInclude(p => p.User)
+                .ToListAsync();
+        }
+
         public async Task RemoveShareAsync(int postId, string userId)
         {
             var share = await _context.Shares.FirstOrDefaultAsync(l => l.PostId == postId && l.UserId == userId);
@@ -50,13 +59,14 @@ namespace ArtistryNetAPI.Services
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Share>> GetAllSharesAsync()
+        public async Task<IEnumerable<Share>> GetSharesByUsernameAsync(string username)
         {
             return await _context.Shares
                 .Include(s => s.User)
                 .Include(s => s.Post)
-                    .ThenInclude(p => p.User)
+                .Where(s => s.User.UserName == username)
                 .ToListAsync();
         }
+
     }
 }

@@ -140,4 +140,39 @@ public class ProductsController : ControllerBase
         }
     }
 
+    [HttpGet("getProductsByUsername/{username}")]
+    public async Task<IActionResult> GetProductsByUsernameAsync(string username)
+    {
+        try
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            var products = await _context.Products
+                .Include(p => p.User)
+                .Where(p => p.UserId == user.Id)
+                .ToListAsync();
+
+            var productDtos = products.Select(product => new ProductDto
+            {
+                Id = product.Id,
+                Username = product.User?.UserName,
+                ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(product.User?.ProfilePhoto)}"),
+                Title = product.Title,
+                Price = product.Price,
+                ImageUrl = Url.Content($"~/images/products/{product.ImageUrl}"),
+                UserId = product.UserId
+            });
+
+            return Ok(productDtos);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving products by username: {ex.Message}");
+            return StatusCode(500, "An error occurred while retrieving the products.");
+        }
+    }
 }                                                                                                 

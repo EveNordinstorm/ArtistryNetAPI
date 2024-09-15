@@ -9,6 +9,7 @@ using ArtistryNetAPI.Entities;
 using ArtistryNetAPI.Models;
 using ArtistryNetAPI.Interfaces;
 using Microsoft.Extensions.Configuration;
+using ArtistryNetAPI.Dto;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -99,18 +100,20 @@ public class AccountController : ControllerBase
 
         var profilePhotoUrl = Url.Content($"~/images/profiles/{Path.GetFileName(user.ProfilePhoto)}");
 
-        return Ok(new
+        var userDto = new UserAccountDto
         {
-            user.Id,
-            user.Username,
-            user.Email,
+            Id = user.Id,
+            Username = user.UserName,
+            Email = user.Email,
             ProfilePhoto = profilePhotoUrl,
-            user.Bio,
-        });
+            Bio = user.Bio
+        };
+
+        return Ok(userDto);
     }
 
-    [HttpGet("getUserIdByUsername/{username}")]
-    public async Task<IActionResult> GetUserIdByUsername(string username)
+    [HttpGet("getUserDetailsByUsername/{username}")]
+    public async Task<IActionResult> GetUserDetailsByUsername(string username)
     {
         var user = await _userService.FindByUsernameAsync(username);
         if (user == null)
@@ -118,6 +121,17 @@ public class AccountController : ControllerBase
             return NotFound(new { Message = "User not found." });
         }
 
-        return Ok(new { Id = user.Id });
+        var profilePhotoUrl = Url.Content($"~/images/profiles/{Path.GetFileName(user.ProfilePhoto)}");
+
+        var userDto = new UserAccountDto
+        {
+            Id = user.Id,
+            Username = user.UserName,
+            Email = user.Email,
+            ProfilePhoto = profilePhotoUrl,
+            Bio = user.Bio
+        };
+
+        return Ok(userDto);
     }
 }

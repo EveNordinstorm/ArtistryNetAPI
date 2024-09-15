@@ -9,16 +9,20 @@ using ArtistryNetAPI.Models;
 using ArtistryNetAPI.Services;
 using ArtistryNetAPI.Dto;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using ArtistryNetAPI.Data;
 
 [Route("api/[controller]")]
 [ApiController]
 public class SharesController : ControllerBase
 {
     private readonly IShareService _shareService;
+    private readonly ApplicationDbContext _context;
 
-    public SharesController(IShareService shareService)
+    public SharesController(IShareService shareService, ApplicationDbContext context)
     {
         _shareService = shareService;
+        _context = context;
     }
 
     [HttpPost]
@@ -98,6 +102,45 @@ public class SharesController : ControllerBase
         }
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAllShares()
+    {
+        try
+        {
+            var shares = await _shareService.GetAllSharesAsync();
+
+            var sharesDto = shares.Select(share => new SharesDto
+            {
+                Id = share.Id,
+                PostId = share.PostId,
+                ShareDateTime = share.ShareDateTime,
+                Sharer = new SharerDto
+                {
+                    Username = share.User?.Username,
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}"),
+                    UserId = share.UserId
+                },
+                OriginalPost = new OriginalPostDto
+                {
+                    Id = share.Post.Id,
+                    Description = share.Post.Description,
+                    ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
+                    PostDateTime = share.Post.PostDateTime,
+                    Username = share.Post.Username,
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
+                    UserId = share.Post.UserId
+                }
+            });
+
+            return Ok(sharesDto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving all shares: {ex.Message}");
+            return StatusCode(500, "An error occurred while retrieving all shares.");
+        }
+    }
+
     [HttpGet("user")]
     public async Task<IActionResult> GetSharesByUser()
     {
@@ -144,14 +187,20 @@ public class SharesController : ControllerBase
         }
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAllShares()
+    [HttpGet("getSharesByUsername/{username}")]
+    public async Task<IActionResult> GetSharesByUsernameAsync(string username)
     {
         try
         {
-            var shares = await _shareService.GetAllSharesAsync();
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
 
-            var sharesDto = shares.Select(share => new SharesDto
+            var shares = await _shareService.GetSharesByUserAsync(user.Id);
+
+            var sharesDtos = shares.Select(share => new SharesDto
             {
                 Id = share.Id,
                 PostId = share.PostId,
@@ -174,12 +223,12 @@ public class SharesController : ControllerBase
                 }
             });
 
-            return Ok(sharesDto);
+            return Ok(sharesDtos);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error retrieving all shares: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving all shares.");
+            Console.WriteLine($"Error retrieving shares by username: {ex.Message}");
+            return StatusCode(500, "An error occurred while retrieving the shares.");
         }
     }
 }
