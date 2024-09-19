@@ -24,7 +24,7 @@ public class PostsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreatePost([FromForm] PostModel model, [FromForm] IFormFile imageUrl)
+    public async Task<IActionResult> CreatePost([FromForm] PostModel model, [FromForm] IFormFile? imageUrl)
     {
         try
         {
@@ -52,7 +52,11 @@ public class PostsController : ControllerBase
 
             await _postService.CreatePostAsync(post, imageUrl, userIdFromToken);
 
-            var imageUrlResult = Url.Content($"~/images/posts/{post.ImageUrl}");
+            string? imageUrlResult = null;
+            if (post.ImageUrl != null)
+            {
+                imageUrlResult = Url.Content($"~/images/posts/{post.ImageUrl}");
+            }
 
             return Ok(new
             {
@@ -71,6 +75,41 @@ public class PostsController : ControllerBase
         }
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePost(int id)
+    {
+        try
+        {
+            var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
+
+            if (userIdFromToken == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var post = await _context.Posts.SingleOrDefaultAsync(p => p.Id == id);
+
+            if (post == null)
+            {
+                return NotFound(new { message = "Post not found." });
+            }
+
+            if (post.UserId != userIdFromToken)
+            {
+                return Forbid("You are not authorized to delete this post.");
+            }
+
+            _context.Posts.Remove(post);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Post deleted successfully." });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting post: {ex.Message}");
+            return StatusCode(500, "An error occurred while deleting the post.");
+        }
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetPosts()

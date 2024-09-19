@@ -9,5 +9,7 @@
         public string Description { get; set; }
         public string ImageUrl { get; set; }
         public string UserId { get; set; }
+        public bool IsLikedByUser { get; set; }
+        public bool IsSavedByUser { get; set; }
     }
 }

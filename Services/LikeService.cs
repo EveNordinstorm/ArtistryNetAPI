@@ -36,6 +36,14 @@ namespace ArtistryNetAPI.Services
                 .Where(l => l.PostId == postId)
                 .ToListAsync();
         }
+
+        public async Task<List<Post>> GetUserLikedPostsAsync(int userId)
+        {
+            return await _context.Likes
+                .Where(l => l.UserId == userId.ToString())
+                .Select(l => l.Post)
+                .ToListAsync();
+        }
     }
 
 }

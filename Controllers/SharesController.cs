@@ -41,7 +41,7 @@ public class SharesController : ControllerBase
             {
                 PostId = model.PostId,
                 UserId = userIdFromToken,
-                ShareDateTime = DateTime.UtcNow
+                ShareDateTime = DateTime.Now
             };
 
             await _shareService.AddShareAsync(share);

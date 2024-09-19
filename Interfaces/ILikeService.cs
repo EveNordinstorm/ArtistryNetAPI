@@ -7,5 +7,6 @@ namespace ArtistryNetAPI.Interfaces
         Task AddLikeAsync(Like like);
         Task RemoveLikeAsync(int postId, string userId);
         Task<IEnumerable<Like>> GetLikesForPostAsync(int postId);
+        Task<List<Post>> GetUserLikedPostsAsync(int userId);
     }
 }

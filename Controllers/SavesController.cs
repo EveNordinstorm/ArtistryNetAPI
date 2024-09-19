@@ -6,16 +6,22 @@ using ArtistryNetAPI.Entities;
 using ArtistryNetAPI.Interfaces;
 using ArtistryNetAPI.Utilities;
 using ArtistryNetAPI.Models;
+using ArtistryNetAPI.Data;
+using ArtistryNetAPI.Dto;
+using Microsoft.EntityFrameworkCore;
+using ArtistryNetAPI.Services;
 
 [Route("api/[controller]")]
 [ApiController]
 public class SavesController : ControllerBase
 {
     private readonly ISaveService _saveService;
+    private readonly ApplicationDbContext _context;
 
-    public SavesController(ISaveService saveService)
+    public SavesController(ISaveService saveService, ApplicationDbContext context)
     {
         _saveService = saveService;
+        _context = context;
     }
 
     [HttpPost]
@@ -47,26 +53,90 @@ public class SavesController : ControllerBase
         }
     }
 
+    [HttpDelete("{postId}")]
+    public async Task<IActionResult> RemoveSave(int postId)
+    {
+        try
+        {
+            var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
+
+            if (string.IsNullOrEmpty(userIdFromToken))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            await _saveService.RemoveSaveAsync(postId, userIdFromToken);
+
+            return Ok(new { message = "Save removed successfully" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error removing save: {ex.Message}");
+            return StatusCode(500, "An error occurred while removing the save.");
+        }
+    }
+
     [HttpGet("{postId}")]
     public async Task<IActionResult> GetSavesForPost(int postId)
     {
         try
         {
-            var saves = await _saveService.GetSavesForPostAsync(postId);
+            var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
-            var saveDtos = saves.Select(save => new
+            if (userIdFromToken == null)
             {
-                save.Id,
-                save.PostId,
-                save.UserId
-            });
+                return Unauthorized(new { message = "Invalid token" });
+            }
 
-            return Ok(saveDtos);
+            var saves = await _saveService.GetSavesForPostAsync(postId);
+            var isSavedByUser = saves.Any(save => save.UserId == userIdFromToken);
+
+            return Ok(new { isSavedByUser });
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error retrieving saves: {ex.Message}");
             return StatusCode(500, "An error occurred while retrieving the saves.");
+        }
+    }
+
+    [HttpGet("user")]
+    public async Task<IActionResult> GetUserSavedPosts()
+    {
+        try
+        {
+            var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
+
+            if (userIdFromToken == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var savedPosts = await _context.Saves
+                .Include(s => s.Post)
+                .ThenInclude(p => p.User)
+                .Where(s => s.UserId == userIdFromToken)
+                .Select(s => s.Post)
+                .ToListAsync();
+
+            var postDtos = savedPosts.Select(post => new PostDto
+            {
+                Id = post.Id,
+                Username = post.User?.UserName,
+                ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
+                PostDateTime = post.PostDateTime,
+                Description = post.Description,
+                ImageUrl = Url.Content($"~/images/posts/{post.ImageUrl}"),
+                UserId = post.UserId,
+                IsSavedByUser = true
+            });
+
+            return Ok(postDtos);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving saved posts: {ex.Message}");
+            return StatusCode(500, "An error occurred while retrieving saved posts.");
         }
     }
 }

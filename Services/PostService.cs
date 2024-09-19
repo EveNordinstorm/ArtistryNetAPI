@@ -89,22 +89,32 @@ namespace ArtistryNetAPI.Services
             }
         }
 
-        public async Task DeletePostAsync(int id)
+        public async Task DeletePostAsync(int postId)
         {
-            var post = await _context.Posts.FindAsync(id);
+            // Remove associated likes
+            var likes = _context.Likes.Where(l => l.PostId == postId);
+            _context.Likes.RemoveRange(likes);
+
+            // Remove associated shares
+            var shares = _context.Shares.Where(s => s.PostId == postId);
+            _context.Shares.RemoveRange(shares);
+
+            // Remove associated comments
+            var comments = _context.Comments.Where(c => c.PostId == postId);
+            _context.Comments.RemoveRange(comments);
+
+            // Remove associated saves
+            var saves = _context.Saves.Where(s => s.PostId == postId);
+            _context.Saves.RemoveRange(saves);
+
+            // Remove the post
+            var post = await _context.Posts.FindAsync(postId);
             if (post != null)
             {
-                try
-                {
-                    _context.Posts.Remove(post);
-                    await _context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error deleting post: {ex.Message}");
-                    throw;
-                }
+                _context.Posts.Remove(post);
             }
+
+            await _context.SaveChangesAsync();
         }
     }
 }
