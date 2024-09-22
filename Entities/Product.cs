@@ -14,7 +14,7 @@
 
         public string ImageUrl { get; set; } = string.Empty;
 
-        public int Price { get; set; }
+        public decimal Price { get; set; }
 
         public ApplicationUser User { get; set; } = null!;
     }

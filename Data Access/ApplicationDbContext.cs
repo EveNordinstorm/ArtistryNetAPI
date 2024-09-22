@@ -34,6 +34,10 @@ namespace ArtistryNetAPI.Data
             .WithMany(u => u.Products)
             .HasForeignKey(p => p.UserId);
 
+            modelBuilder.Entity<Product>()
+            .Property(p => p.Price)
+            .HasColumnType("decimal(18,2)");
+
             modelBuilder.Entity<Post>()
                 .HasMany(p => p.Likes)
                 .WithOne(l => l.Post)

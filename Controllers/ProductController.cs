@@ -72,6 +72,42 @@ public class ProductsController : ControllerBase
         }
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProduct(int id)
+    {
+        try
+        {
+            var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
+            if (userIdFromToken == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            if (product == null)
+            {
+                return NotFound(new { message = "Product not found" });
+            }
+
+            if (product.UserId != userIdFromToken)
+            {
+                return Forbid("You are not authorized to delete this product.");
+            }
+
+            await _productService.DeleteProductAsync(id);
+
+            return Ok(new { message = "Product deleted successfully" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting product: {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
+            return StatusCode(500, "An error occurred while deleting the product.");
+        }
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetProducts()

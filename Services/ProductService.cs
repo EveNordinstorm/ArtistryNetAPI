@@ -16,6 +16,16 @@ namespace ArtistryNetAPI.Services
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
 
+        public async Task DeleteProductAsync(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
             return await _context.Products
@@ -81,24 +91,6 @@ namespace ArtistryNetAPI.Services
             {
                 Console.WriteLine($"Error updating product: {ex.Message}");
                 throw;
-            }
-        }
-
-        public async Task DeleteProductAsync(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
-            {
-                try
-                {
-                    _context.Products.Remove(product);
-                    await _context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error deleting product: {ex.Message}");
-                    throw;
-                }
             }
         }
     }
