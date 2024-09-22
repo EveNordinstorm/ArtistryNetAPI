@@ -46,7 +46,7 @@ public class SharesController : ControllerBase
 
             await _shareService.AddShareAsync(share);
 
-            return Ok(new { message = "Share added successfully" });
+            return Ok(new { id = share.Id, message = "Share added successfully" });
         }
         catch (Exception ex)
         {
@@ -55,7 +55,7 @@ public class SharesController : ControllerBase
         }
     }
 
-    [HttpGet("{postId}")]
+    [HttpGet("post/{postId}")]
     public async Task<IActionResult> GetSharesForPost(int postId)
     {
         try
@@ -77,6 +77,20 @@ public class SharesController : ControllerBase
             Console.WriteLine($"Error retrieving shares: {ex.Message}");
             return StatusCode(500, "An error occurred while retrieving the shares.");
         }
+    }
+
+    [HttpGet("share-status/{postId}")]
+    public async Task<IActionResult> CheckShareStatusAsync(int postId)
+    {
+        var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
+
+        if (userIdFromToken == null)
+        {
+            return Unauthorized(new { message = "Invalid token" });
+        }
+
+        var isShared = await _shareService.HasUserSharedPostAsync(userIdFromToken, postId);
+        return Ok(new { isSharedByUser = isShared });
     }
 
     [HttpDelete("{postId}")]
@@ -138,6 +152,48 @@ public class SharesController : ControllerBase
         {
             Console.WriteLine($"Error retrieving all shares: {ex.Message}");
             return StatusCode(500, "An error occurred while retrieving all shares.");
+        }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetShareByIdAsync(int id)
+    {
+        try
+        {
+            var share = await _shareService.GetShareByIdAsync(id);
+            if (share == null) return NotFound();
+
+            var sharesDto = new SharesDto
+            {
+                Id = share.Id,
+                PostId = share.PostId,
+                ShareDateTime = share.ShareDateTime,
+                Sharer = new SharerDto
+                {
+                    Username = share.User?.Username,
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}"),
+                    UserId = share.UserId
+                },
+                OriginalPost = new OriginalPostDto
+                {
+                    Id = share.Post.Id,
+                    Description = share.Post.Description,
+                    ImageUrl = string.IsNullOrEmpty(share.Post.ImageUrl)
+                            ? null
+                            : Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
+                    PostDateTime = share.Post.PostDateTime,
+                    Username = share.Post.Username,
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
+                    UserId = share.Post.UserId
+                }
+            };
+
+            return Ok(sharesDto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving user shares: {ex.Message}");
+            return StatusCode(500, "An error occurred while retrieving the user's shares.");
         }
     }
 

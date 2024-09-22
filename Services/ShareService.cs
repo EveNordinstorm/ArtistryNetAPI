@@ -49,6 +49,20 @@ namespace ArtistryNetAPI.Services
                 .ToListAsync();
         }
 
+        public async Task<Share> GetShareByIdAsync(int id)
+        {
+            return await _context.Shares
+                .Include(s => s.User)
+                .Include(s => s.Post)
+                    .ThenInclude(p => p.User)
+                .FirstOrDefaultAsync(s => s.Id == id);
+        }
+
+        public async Task<bool> HasUserSharedPostAsync(string userId, int postId)
+        {
+            return await _context.Shares.AnyAsync(s => s.UserId == userId && s.PostId == postId);
+        }
+
         public async Task<IEnumerable<Share>> GetSharesByUserAsync(string userId)
         {
             return await _context.Shares

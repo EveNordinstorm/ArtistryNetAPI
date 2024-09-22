@@ -12,6 +12,6 @@ namespace ArtistryNetAPI.Interfaces
         Task<IEnumerable<Post>> GetPostsByUsernameAsync(string username);
         Task CreatePostAsync(Post post, IFormFile image, string userId);
         Task UpdatePostAsync(Post post);
-        Task DeletePostAsync(int id);
+        Task<bool?> DeletePostAsync(int postId, string userId);
     }
 }

@@ -8,6 +8,8 @@ namespace ArtistryNetAPI.Interfaces
         Task RemoveShareAsync(int postId, string userId);
         Task<IEnumerable<Share>> GetSharesByUsernameAsync(string username);
         Task<IEnumerable<Share>> GetSharesForPostAsync(int postId);
+        Task<Share> GetShareByIdAsync(int id);
+        Task<bool> HasUserSharedPostAsync(string userId, int postId);
         Task<IEnumerable<Share>> GetSharesByUserAsync(string UserId);
         Task<IEnumerable<Share>> GetAllSharesAsync();
     }

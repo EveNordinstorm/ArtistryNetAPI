@@ -9,6 +9,7 @@ using ArtistryNetAPI.Utilities;
 using Microsoft.EntityFrameworkCore;
 using ArtistryNetAPI.Data;
 using ArtistryNetAPI.Dto;
+using ArtistryNetAPI.Services;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -96,6 +97,38 @@ public class ProductsController : ControllerBase
         {
             Console.WriteLine($"Error retrieving products: {ex.Message}");
             return StatusCode(500, "An error occurred while retrieving the products.");
+        }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetProductByIdAsync(int id)
+    {
+        try
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null) return NotFound();
+
+            var productDto = new ProductDto
+            {
+                Id = product.Id,
+                Username = product.User?.UserName,
+                ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(product.User?.ProfilePhoto)}"),
+                Title = product.Title,
+                Price = product.Price,
+                ImageUrl = Url.Content($"~/images/products/{product.ImageUrl}"),
+                UserId = product.UserId
+            };
+
+            return Ok(productDto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving user products: {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
+            return StatusCode(500, "An error occurred while retrieving the user's products.");
         }
     }
 

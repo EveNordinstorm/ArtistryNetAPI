@@ -89,32 +89,30 @@ namespace ArtistryNetAPI.Services
             }
         }
 
-        public async Task DeletePostAsync(int postId)
+        public async Task<bool?> DeletePostAsync(int postId, string userId)
         {
-            // Remove associated likes
-            var likes = _context.Likes.Where(l => l.PostId == postId);
-            _context.Likes.RemoveRange(likes);
+            var post = await _context.Posts
+                .Include(p => p.Likes)
+                .Include(p => p.Comments)
+                .Include(p => p.Saves)
+                .Include(p => p.Shares)
+                .SingleOrDefaultAsync(p => p.Id == postId);
 
-            // Remove associated shares
-            var shares = _context.Shares.Where(s => s.PostId == postId);
-            _context.Shares.RemoveRange(shares);
-
-            // Remove associated comments
-            var comments = _context.Comments.Where(c => c.PostId == postId);
-            _context.Comments.RemoveRange(comments);
-
-            // Remove associated saves
-            var saves = _context.Saves.Where(s => s.PostId == postId);
-            _context.Saves.RemoveRange(saves);
-
-            // Remove the post
-            var post = await _context.Posts.FindAsync(postId);
-            if (post != null)
+            if (post == null)
             {
-                _context.Posts.Remove(post);
+                return null; // Post not found
             }
 
+            if (post.UserId != userId)
+            {
+                return false; // Not authorized
+            }
+
+            _context.Posts.Remove(post);
             await _context.SaveChangesAsync();
+
+            return true; // Successfully deleted
         }
+
     }
 }

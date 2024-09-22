@@ -60,6 +60,7 @@ public class PostsController : ControllerBase
 
             return Ok(new
             {
+                Id = post.Id,
                 Message = "Post created successfully",
                 ImageUrl = imageUrlResult
             });
@@ -87,20 +88,17 @@ public class PostsController : ControllerBase
                 return Unauthorized(new { message = "Invalid token" });
             }
 
-            var post = await _context.Posts.SingleOrDefaultAsync(p => p.Id == id);
+            var result = await _postService.DeletePostAsync(id, userIdFromToken);
 
-            if (post == null)
+            if (result == null)
             {
                 return NotFound(new { message = "Post not found." });
             }
 
-            if (post.UserId != userIdFromToken)
+            if (!result.Value)
             {
                 return Forbid("You are not authorized to delete this post.");
             }
-
-            _context.Posts.Remove(post);
-            await _context.SaveChangesAsync();
 
             return Ok(new { message = "Post deleted successfully." });
         }
@@ -130,6 +128,34 @@ public class PostsController : ControllerBase
             });
 
             return Ok(postDtos);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving posts: {ex.Message}");
+            return StatusCode(500, "An error occurred while retrieving the posts.");
+        }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetPostById(int id)
+    {
+        try
+        {
+            var post = await _postService.GetPostByIdAsync(id);
+            if (post == null) return NotFound();
+
+            var postDto = new PostDto
+            {
+                Id = post.Id,
+                Username = post.User?.UserName,
+                ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
+                PostDateTime = post.PostDateTime,
+                Description = post.Description,
+                ImageUrl = Url.Content($"~/images/posts/{post.ImageUrl}"),
+                UserId = post.UserId
+            };
+
+            return Ok(postDto);
         }
         catch (Exception ex)
         {
