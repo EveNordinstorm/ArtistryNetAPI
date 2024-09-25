@@ -43,6 +43,7 @@ builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IShareService, ShareService>();
 builder.Services.AddScoped<ISaveService, SaveService>();
+builder.Services.AddScoped<IFollowersService, FollowersService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();

@@ -19,6 +19,7 @@ namespace ArtistryNetAPI.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Share> Shares { get; set; }
         public DbSet<Save> Saves { get; set; }
+        public DbSet<Follower> Followers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -81,6 +82,18 @@ namespace ArtistryNetAPI.Data
                 .HasOne(s => s.User)
                 .WithMany(u => u.Saves)
                 .HasForeignKey(s => s.UserId);
+
+            modelBuilder.Entity<Follower>()
+                .HasOne(f => f.FollowerUser)
+                .WithMany(u => u.Following)
+                .HasForeignKey(f => f.FollowerID)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Follower>()
+                .HasOne(f => f.FollowedUser)
+                .WithMany(u => u.Followers)
+                .HasForeignKey(f => f.FollowedID)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

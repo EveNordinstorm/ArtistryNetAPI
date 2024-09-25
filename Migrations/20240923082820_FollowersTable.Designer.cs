@@ -4,6 +4,7 @@ using ArtistryNetAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ArtistryNetAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240923082820_FollowersTable")]
+    partial class FollowersTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -119,25 +122,19 @@ namespace ArtistryNetAPI.Migrations
 
             modelBuilder.Entity("ArtistryNetAPI.Entities.Follower", b =>
                 {
-                    b.Property<int>("FollowID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("FollowerID")
+                        .HasColumnType("nvarchar(450)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FollowID"));
+                    b.Property<int>("FollowID")
+                        .HasColumnType("int");
 
                     b.Property<string>("FollowedID")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("FollowerID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("FollowID");
+                    b.HasKey("FollowerID");
 
                     b.HasIndex("FollowedID");
-
-                    b.HasIndex("FollowerID");
 
                     b.ToTable("Followers");
                 });

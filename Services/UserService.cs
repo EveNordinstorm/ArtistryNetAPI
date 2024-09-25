@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using System.Threading.Tasks;
+using ArtistryNetAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ArtistryNetAPI.Services
 {
@@ -12,11 +14,13 @@ namespace ArtistryNetAPI.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _environment;
+        private readonly ApplicationDbContext _context;
 
-        public UserService(UserManager<ApplicationUser> userManager, IWebHostEnvironment environment)
+        public UserService(UserManager<ApplicationUser> userManager, IWebHostEnvironment environment, ApplicationDbContext context)
         {
             _userManager = userManager;
             _environment = environment;
+            _context = context;
         }
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterModel model)
@@ -59,6 +63,20 @@ namespace ArtistryNetAPI.Services
         public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
         {
             return await _userManager.CheckPasswordAsync(user, password);
+        }
+
+        public async Task<(int followingCount, int followersCount)> GetFollowerCountsAsync(string username)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+            if (user == null)
+            {
+                throw new ArgumentException("User not found");
+            }
+
+            var followingCount = await _context.Followers.CountAsync(f => f.FollowerID == user.Id);
+            var followersCount = await _context.Followers.CountAsync(f => f.FollowedID == user.Id);
+
+            return (followingCount, followersCount);
         }
     }
 }

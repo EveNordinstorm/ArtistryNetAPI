@@ -14,5 +14,7 @@ namespace ArtistryNetAPI.Entities
         public ICollection<Like> Likes { get; set; } = new List<Like>();
         public ICollection<Share> Shares { get; set; } = new List<Share>();
         public ICollection<Save> Saves { get; set; } = new List<Save>();
+        public ICollection<Follower> Following { get; set; } = new List<Follower>();
+        public ICollection<Follower> Followers { get; set; } = new List<Follower>();
     }
 }

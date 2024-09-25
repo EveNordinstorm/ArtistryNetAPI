@@ -11,5 +11,6 @@ namespace ArtistryNetAPI.Interfaces
         Task<ApplicationUser> FindByUsernameAsync(string username);
         Task<ApplicationUser> FindByIdAsync(string userId);
         Task<bool> CheckPasswordAsync(ApplicationUser user, string password);
+        Task<(int followingCount, int followersCount)> GetFollowerCountsAsync(string username);
     }
 }
