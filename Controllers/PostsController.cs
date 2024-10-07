@@ -46,7 +46,7 @@ public class PostsController : ControllerBase
                 PostDateTime = DateTime.Now,
                 Description = model.Description,
                 UserId = userIdFromToken,
-                Username = user.UserName,
+                UserName = user.UserName,
                 ProfilePhoto = user.ProfilePhoto
             };
 
@@ -119,7 +119,7 @@ public class PostsController : ControllerBase
             var postDtos = posts.Select(post => new PostDto
             {
                 Id = post.Id,
-                Username = post.User?.UserName,
+                UserName = post.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
                 PostDateTime = post.PostDateTime,
                 Description = post.Description,
@@ -147,7 +147,7 @@ public class PostsController : ControllerBase
             var postDto = new PostDto
             {
                 Id = post.Id,
-                Username = post.User?.UserName,
+                UserName = post.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
                 PostDateTime = post.PostDateTime,
                 Description = post.Description,
@@ -184,7 +184,7 @@ public class PostsController : ControllerBase
             var postDtos = posts.Select(post => new PostDto
             {
                 Id = post.Id,
-                Username = post.User?.UserName,
+                UserName = post.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
                 PostDateTime = post.PostDateTime,
                 Description = post.Description,
@@ -205,8 +205,8 @@ public class PostsController : ControllerBase
         }
     }
 
-    [HttpGet("getPostsByUsername/{username}")]
-    public async Task<IActionResult> GetPostsByUsernameAsync(string username)
+    [HttpGet("getPostsByUserName/{username}")]
+    public async Task<IActionResult> GetPostsByUserNameAsync(string username)
     {
         try
         {
@@ -224,7 +224,7 @@ public class PostsController : ControllerBase
             var postDtos = posts.Select(post => new PostDto
             {
                 Id = post.Id,
-                Username = post.User?.UserName,
+                UserName = post.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
                 PostDateTime = post.PostDateTime,
                 Description = post.Description,

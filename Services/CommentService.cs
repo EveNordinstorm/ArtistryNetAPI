@@ -37,8 +37,8 @@ namespace ArtistryNetAPI.Services
                     Id = c.Id,
                     CommentText = c.CommentText,
                     CommentDateTime = c.CommentDateTime,
-                    Username = c.User.UserName,
-                    ProfilePhoto = c.User.ProfilePhoto // Return the raw profile photo path
+                    UserName = c.User.UserName,
+                    ProfilePhoto = c.User.ProfilePhoto
                 })
                 .ToListAsync();
         }

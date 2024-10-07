@@ -30,6 +30,9 @@ namespace ArtistryNetAPI.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("BannerPhoto")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Bio")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -38,6 +41,7 @@ namespace ArtistryNetAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("EmailConfirmed")
@@ -75,15 +79,12 @@ namespace ArtistryNetAPI.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ArtistryNetAPI.Entities.Comment", b =>
@@ -114,7 +115,7 @@ namespace ArtistryNetAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("ArtistryNetAPI.Entities.Follower", b =>
@@ -139,7 +140,7 @@ namespace ArtistryNetAPI.Migrations
 
                     b.HasIndex("FollowerID");
 
-                    b.ToTable("Followers");
+                    b.ToTable("Followers", (string)null);
                 });
 
             modelBuilder.Entity("ArtistryNetAPI.Entities.Like", b =>
@@ -166,7 +167,7 @@ namespace ArtistryNetAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Likes");
+                    b.ToTable("Likes", (string)null);
                 });
 
             modelBuilder.Entity("ArtistryNetAPI.Entities.Post", b =>
@@ -195,7 +196,7 @@ namespace ArtistryNetAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -203,7 +204,7 @@ namespace ArtistryNetAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("ArtistryNetAPI.Entities.Product", b =>
@@ -233,7 +234,7 @@ namespace ArtistryNetAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -241,7 +242,7 @@ namespace ArtistryNetAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("ArtistryNetAPI.Entities.Save", b =>
@@ -268,7 +269,7 @@ namespace ArtistryNetAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Saves");
+                    b.ToTable("Saves", (string)null);
                 });
 
             modelBuilder.Entity("ArtistryNetAPI.Entities.Share", b =>
@@ -295,7 +296,7 @@ namespace ArtistryNetAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Shares");
+                    b.ToTable("Shares", (string)null);
                 });
 
             modelBuilder.Entity("ArtistryNetAPI.Entities.Comment", b =>

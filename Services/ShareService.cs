@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ArtistryNetAPI.Data;
+﻿using ArtistryNetAPI.Data;
 using ArtistryNetAPI.Entities;
 using ArtistryNetAPI.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ArtistryNetAPI.Services
@@ -23,18 +22,11 @@ namespace ArtistryNetAPI.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Share>> GetAllSharesAsync()
-        {
-            return await _context.Shares
-                .Include(s => s.User)
-                .Include(s => s.Post)
-                    .ThenInclude(p => p.User)
-                .ToListAsync();
-        }
-
         public async Task RemoveShareAsync(int postId, string userId)
         {
-            var share = await _context.Shares.FirstOrDefaultAsync(l => l.PostId == postId && l.UserId == userId);
+            var share = await _context.Shares
+                .FirstOrDefaultAsync(s => s.PostId == postId && s.UserId == userId);
+
             if (share != null)
             {
                 _context.Shares.Remove(share);
@@ -42,9 +34,19 @@ namespace ArtistryNetAPI.Services
             }
         }
 
+        public async Task<IEnumerable<Share>> GetSharesByUserNameAsync(string username)
+        {
+            return await _context.Shares
+                .Include(s => s.User)
+                .Where(s => s.User.UserName == username)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Share>> GetSharesForPostAsync(int postId)
         {
             return await _context.Shares
+                .Include(s => s.User)
+                .Include(s => s.Post)
                 .Where(s => s.PostId == postId)
                 .ToListAsync();
         }
@@ -54,33 +56,30 @@ namespace ArtistryNetAPI.Services
             return await _context.Shares
                 .Include(s => s.User)
                 .Include(s => s.Post)
-                    .ThenInclude(p => p.User)
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<bool> HasUserSharedPostAsync(string userId, int postId)
         {
-            return await _context.Shares.AnyAsync(s => s.UserId == userId && s.PostId == postId);
+            return await _context.Shares
+                .AnyAsync(s => s.UserId == userId && s.PostId == postId);
         }
 
         public async Task<IEnumerable<Share>> GetSharesByUserAsync(string userId)
         {
             return await _context.Shares
-                .Where(s => s.UserId == userId)
                 .Include(s => s.User)
                 .Include(s => s.Post)
-                    .ThenInclude(p => p.User)
+                .Where(s => s.UserId == userId)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Share>> GetSharesByUsernameAsync(string username)
+        public async Task<IEnumerable<Share>> GetAllSharesAsync()
         {
             return await _context.Shares
                 .Include(s => s.User)
                 .Include(s => s.Post)
-                .Where(s => s.User.UserName == username)
                 .ToListAsync();
         }
-
     }
 }

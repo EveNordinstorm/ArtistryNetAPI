@@ -35,7 +35,7 @@ namespace ArtistryNetAPI.Services
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<Post>> GetPostsByUsernameAsync(string username)
+        public async Task<IEnumerable<Post>> GetPostsByUserNameAsync(string username)
         {
             return await _context.Posts
                 .Include(p => p.User)

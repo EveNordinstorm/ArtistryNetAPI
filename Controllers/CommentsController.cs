@@ -70,7 +70,7 @@ public class CommentsController : ControllerBase
             Id = c.Id,
             CommentText = c.CommentText,
             CommentDateTime = c.CommentDateTime,
-            Username = c.Username,
+            UserName = c.UserName,
             ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(c.ProfilePhoto)}")
         }).ToList();
 

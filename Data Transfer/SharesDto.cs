@@ -11,7 +11,7 @@
 
     public class SharerDto
     {
-        public string Username { get; set; }
+        public string UserName { get; set; }
         public string ProfilePhoto { get; set; }
         public string UserId { get; set; }
     }
@@ -22,7 +22,7 @@
         public string Description { get; set; }
         public string ImageUrl { get; set; }
         public DateTime PostDateTime { get; set; }
-        public string Username { get; set; }
+        public string UserName { get; set; }
         public string ProfilePhoto { get; set; }
         public string UserId { get; set; }
 

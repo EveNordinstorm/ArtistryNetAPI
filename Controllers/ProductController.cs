@@ -47,7 +47,7 @@ public class ProductsController : ControllerBase
                 Title = model.Title,
                 Price = model.Price,
                 UserId = userIdFromToken,
-                Username = user.UserName,
+                UserName = user.UserName,
                 ProfilePhoto = user.ProfilePhoto
             };
 
@@ -119,7 +119,7 @@ public class ProductsController : ControllerBase
             var productDtos = products.Select(product => new ProductDto
             {
                 Id = product.Id,
-                Username = product.User?.UserName,
+                UserName = product.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(product.User?.ProfilePhoto)}"),
                 Title = product.Title,
                 Price = product.Price,
@@ -147,7 +147,7 @@ public class ProductsController : ControllerBase
             var productDto = new ProductDto
             {
                 Id = product.Id,
-                Username = product.User?.UserName,
+                UserName = product.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(product.User?.ProfilePhoto)}"),
                 Title = product.Title,
                 Price = product.Price,
@@ -188,7 +188,7 @@ public class ProductsController : ControllerBase
             var productDtos = products.Select(product => new ProductDto
             {
                 Id = product.Id,
-                Username = product.User?.UserName,
+                UserName = product.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(product.User?.ProfilePhoto)}"),
                 Title = product.Title,
                 Price = product.Price,
@@ -209,8 +209,8 @@ public class ProductsController : ControllerBase
         }
     }
 
-    [HttpGet("getProductsByUsername/{username}")]
-    public async Task<IActionResult> GetProductsByUsernameAsync(string username)
+    [HttpGet("getProductsByUserName/{username}")]
+    public async Task<IActionResult> GetProductsByUserNameAsync(string username)
     {
         try
         {
@@ -228,7 +228,7 @@ public class ProductsController : ControllerBase
             var productDtos = products.Select(product => new ProductDto
             {
                 Id = product.Id,
-                Username = product.User?.UserName,
+                UserName = product.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(product.User?.ProfilePhoto)}"),
                 Title = product.Title,
                 Price = product.Price,

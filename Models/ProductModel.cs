@@ -2,7 +2,7 @@
 {
     public class ProductModel
     {
-        public string Username { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
         public string ProfilePhoto { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public IFormFile ImageUrl { get; set; }

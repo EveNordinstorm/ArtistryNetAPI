@@ -122,7 +122,7 @@ public class SavesController : ControllerBase
             var postDtos = savedPosts.Select(post => new PostDto
             {
                 Id = post.Id,
-                Username = post.User?.UserName,
+                UserName = post.User?.UserName,
                 ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(post.User?.ProfilePhoto)}"),
                 PostDateTime = post.PostDateTime,
                 Description = post.Description,

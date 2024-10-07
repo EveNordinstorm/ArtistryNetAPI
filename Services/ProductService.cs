@@ -40,7 +40,7 @@ namespace ArtistryNetAPI.Services
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<Product>> GetProductsByUsernameAsync(string username)
+        public async Task<IEnumerable<Product>> GetProductsByUserNameAsync(string username)
         {
             return await _context.Products
                 .Include(p => p.User)

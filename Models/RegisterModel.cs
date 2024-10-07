@@ -4,10 +4,11 @@ namespace ArtistryNetAPI.Models
 {
     public class RegisterModel
     {
-        public string Username { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
         public IFormFile ProfilePhoto { get; set; }
-        public string Bio { get; set; } = string.Empty;
+        public string UserName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string Bio { get; set; }
+        public IFormFile? BannerPhoto { get; set; }
     }
 }

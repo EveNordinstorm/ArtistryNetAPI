@@ -37,6 +37,13 @@ public class SharesController : ControllerBase
                 return Unauthorized(new { message = "Invalid token" });
             }
 
+            // Fetch the user to set the username for the share
+            var user = await _context.Users.FindAsync(userIdFromToken);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
             var share = new Share
             {
                 PostId = model.PostId,
@@ -130,7 +137,7 @@ public class SharesController : ControllerBase
                 ShareDateTime = share.ShareDateTime,
                 Sharer = new SharerDto
                 {
-                    Username = share.User?.Username,
+                    UserName = share.User?.UserName,
                     ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}"),
                     UserId = share.UserId
                 },
@@ -140,7 +147,7 @@ public class SharesController : ControllerBase
                     Description = share.Post.Description,
                     ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
                     PostDateTime = share.Post.PostDateTime,
-                    Username = share.Post.Username,
+                    UserName = share.Post.UserName,
                     ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
                     UserId = share.Post.UserId
                 }
@@ -170,7 +177,7 @@ public class SharesController : ControllerBase
                 ShareDateTime = share.ShareDateTime,
                 Sharer = new SharerDto
                 {
-                    Username = share.User?.Username,
+                    UserName = share.User?.UserName,
                     ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}"),
                     UserId = share.UserId
                 },
@@ -182,7 +189,7 @@ public class SharesController : ControllerBase
                             ? null
                             : Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
                     PostDateTime = share.Post.PostDateTime,
-                    Username = share.Post.Username,
+                    UserName = share.Post.UserName,
                     ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
                     UserId = share.Post.UserId
                 }
@@ -218,7 +225,7 @@ public class SharesController : ControllerBase
                 ShareDateTime = share.ShareDateTime,
                 Sharer = new SharerDto
                 {
-                    Username = share.User?.Username,
+                    UserName = share.User?.UserName,
                     ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}"),
                     UserId = share.UserId
                 },
@@ -228,7 +235,7 @@ public class SharesController : ControllerBase
                     Description = share.Post.Description,
                     ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
                     PostDateTime = share.Post.PostDateTime,
-                    Username = share.Post.Username,
+                    UserName = share.Post.UserName,
                     ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
                     UserId = share.Post.UserId
                 }
@@ -243,8 +250,8 @@ public class SharesController : ControllerBase
         }
     }
 
-    [HttpGet("getSharesByUsername/{username}")]
-    public async Task<IActionResult> GetSharesByUsernameAsync(string username)
+    [HttpGet("getSharesByUserName/{username}")]
+    public async Task<IActionResult> GetSharesByUserNameAsync(string username)
     {
         try
         {
@@ -263,7 +270,7 @@ public class SharesController : ControllerBase
                 ShareDateTime = share.ShareDateTime,
                 Sharer = new SharerDto
                 {
-                    Username = share.User?.Username,
+                    UserName = share.User?.UserName,
                     ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.User?.ProfilePhoto)}"),
                     UserId = share.UserId
                 },
@@ -273,7 +280,7 @@ public class SharesController : ControllerBase
                     Description = share.Post.Description,
                     ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
                     PostDateTime = share.Post.PostDateTime,
-                    Username = share.Post.Username,
+                    UserName = share.Post.UserName,
                     ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
                     UserId = share.Post.UserId
                 }
@@ -283,8 +290,8 @@ public class SharesController : ControllerBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error retrieving shares by username: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the shares.");
+            Console.WriteLine($"Error retrieving shares for username: {ex.Message}");
+            return StatusCode(500, "An error occurred while retrieving shares for the username.");
         }
     }
 }

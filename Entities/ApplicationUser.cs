@@ -4,9 +4,12 @@ namespace ArtistryNetAPI.Entities
 {
     public class ApplicationUser : IdentityUser
     {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Email { get; set; } = string.Empty;
         public string ProfilePhoto { get; set; } = string.Empty;
-        public string Username { get; set; } = string.Empty;
+        public string? BannerPhoto { get; set; }
         public string Bio { get; set; } = string.Empty;
+        // public string PasswordHash { get; set; } = string.Empty;
 
         public ICollection<Post> Posts { get; set; } = new List<Post>();
         public ICollection<Product> Products { get; set; } = new List<Product>();

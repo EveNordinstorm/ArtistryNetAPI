@@ -101,7 +101,7 @@ namespace ArtistryNetAPI.Controllers
                     followersDetails.Add(new UserAccountDto
                     {
                         Id = user.Id,
-                        Username = user.UserName,
+                        UserName = user.UserName,
                         ProfilePhoto = profilePhotoUrl
                     });
                 }
@@ -130,7 +130,7 @@ namespace ArtistryNetAPI.Controllers
                     followingDetails.Add(new UserAccountDto
                     {
                         Id = user.Id,
-                        Username = user.UserName,
+                        UserName = user.UserName,
                         ProfilePhoto = profilePhotoUrl
                     });
                 }
