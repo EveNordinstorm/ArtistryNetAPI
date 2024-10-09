@@ -9,7 +9,6 @@ namespace ArtistryNetAPI.Entities
         public string ProfilePhoto { get; set; } = string.Empty;
         public string? BannerPhoto { get; set; }
         public string Bio { get; set; } = string.Empty;
-        // public string PasswordHash { get; set; } = string.Empty;
 
         public ICollection<Post> Posts { get; set; } = new List<Post>();
         public ICollection<Product> Products { get; set; } = new List<Product>();

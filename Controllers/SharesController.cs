@@ -167,7 +167,12 @@ public class SharesController : ControllerBase
     {
         try
         {
-            var share = await _shareService.GetShareByIdAsync(id);
+            var share = await _context.Shares
+                .Include(s => s.Post)
+                .ThenInclude(p => p.User)
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
             if (share == null) return NotFound();
 
             var sharesDto = new SharesDto

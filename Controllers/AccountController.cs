@@ -63,7 +63,9 @@ public class AccountController : ControllerBase
 
         var profilePhotoUrl = Url.Content($"~/images/profiles/{Path.GetFileName(user.ProfilePhoto)}");
 
-        var bannerPhotoUrl = Url.Content($"~/images/banners/{Path.GetFileName(user.BannerPhoto)}");
+        string bannerPhotoUrl = string.IsNullOrEmpty(user.BannerPhoto)
+        ? null
+        : Url.Content($"~/images/banners/{Path.GetFileName(user.BannerPhoto)}");
 
         var token = GenerateJwtToken(user);
         _logger.LogInformation("User {UserName} logged in successfully", user.UserName);
@@ -118,7 +120,9 @@ public class AccountController : ControllerBase
 
         var profilePhotoUrl = Url.Content($"~/images/profiles/{Path.GetFileName(user.ProfilePhoto)}");
 
-        var bannerPhotoUrl = Url.Content($"~/images/banners/{Path.GetFileName(user.BannerPhoto)}");
+        string bannerPhotoUrl = string.IsNullOrEmpty(user.BannerPhoto)
+        ? null
+        : Url.Content($"~/images/banners/{Path.GetFileName(user.BannerPhoto)}");
 
         var userDto = new UserAccountDto
         {
@@ -147,7 +151,9 @@ public class AccountController : ControllerBase
 
         var profilePhotoUrl = Url.Content($"~/images/profiles/{Path.GetFileName(user.ProfilePhoto)}");
 
-        var bannerPhotoUrl = Url.Content($"~/images/banners/{Path.GetFileName(user.BannerPhoto)}");
+        string bannerPhotoUrl = string.IsNullOrEmpty(user.BannerPhoto)
+        ? null
+        : Url.Content($"~/images/banners/{Path.GetFileName(user.BannerPhoto)}");
 
         var userDto = new UserAccountDto
         {
@@ -173,6 +179,11 @@ public class AccountController : ControllerBase
         }
 
         _logger.LogInformation("Updating profile for user with ID: {UserId}", userId);
+
+        if (model.BannerPhoto == null)
+        {
+            model.BannerPhoto = null; // Set to null if no file uploaded
+        }
 
         var result = await _userService.UpdateUserProfileAsync(userId, model);
         if (result)

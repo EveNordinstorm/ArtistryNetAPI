@@ -103,14 +103,15 @@ namespace ArtistryNetAPI.Services
                 string profileUploadsFolder = Path.Combine(_environment.WebRootPath, "images/profiles");
                 Directory.CreateDirectory(profileUploadsFolder);
 
-                string profileFilePath = Path.Combine(profileUploadsFolder, model.ProfilePhoto.FileName);
+                string profileFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(model.ProfilePhoto.FileName);
+                string profileFilePath = Path.Combine(profileUploadsFolder, profileFileName);
 
                 using (var fileStream = new FileStream(profileFilePath, FileMode.Create))
                 {
                     await model.ProfilePhoto.CopyToAsync(fileStream);
                 }
 
-                user.ProfilePhoto = profileFilePath;
+                user.ProfilePhoto = profileFileName;
             }
 
             if (model.BannerPhoto != null)
@@ -120,14 +121,19 @@ namespace ArtistryNetAPI.Services
                 string bannerUploadsFolder = Path.Combine(_environment.WebRootPath, "images/banners");
                 Directory.CreateDirectory(bannerUploadsFolder);
 
-                string bannerFilePath = Path.Combine(bannerUploadsFolder, model.BannerPhoto.FileName);
+                string bannerFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(model.BannerPhoto.FileName);
+                string bannerFilePath = Path.Combine(bannerUploadsFolder, bannerFileName);
 
                 using (var fileStream = new FileStream(bannerFilePath, FileMode.Create))
                 {
                     await model.BannerPhoto.CopyToAsync(fileStream);
                 }
 
-                user.BannerPhoto = bannerFilePath;
+                user.BannerPhoto = bannerFileName;
+            }
+            else
+            {
+                user.BannerPhoto = null;
             }
 
             if (!string.IsNullOrWhiteSpace(model.Bio))
@@ -152,6 +158,7 @@ namespace ArtistryNetAPI.Services
 
             return updateResult.Succeeded;
         }
+
 
         public async Task<ApplicationUser> FindByUserNameAsync(string username)
         {
