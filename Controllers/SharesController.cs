@@ -28,7 +28,6 @@ public class SharesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddShare([FromBody] ShareModel model)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -55,17 +54,11 @@ public class SharesController : ControllerBase
 
             return Ok(new { id = share.Id, message = "Share added successfully" });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error adding share: {ex.Message}");
-            return StatusCode(500, "An error occurred while adding the share.");
-        }
     }
 
     [HttpGet("post/{postId}")]
     public async Task<IActionResult> GetSharesForPost(int postId)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -78,11 +71,6 @@ public class SharesController : ControllerBase
             var isSharedByUser = shares.Any(share => share.UserId == userIdFromToken);
 
             return Ok(new { isSharedByUser });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving shares: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the shares.");
         }
     }
 
@@ -103,7 +91,6 @@ public class SharesController : ControllerBase
     [HttpDelete("{postId}")]
     public async Task<IActionResult> RemoveShare(int postId)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -116,17 +103,11 @@ public class SharesController : ControllerBase
 
             return Ok(new { message = "Share removed successfully" });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error removing share: {ex.Message}");
-            return StatusCode(500, "An error occurred while removing the share.");
-        }
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllShares()
     {
-        try
         {
             var shares = await _shareService.GetAllSharesAsync();
 
@@ -155,17 +136,11 @@ public class SharesController : ControllerBase
 
             return Ok(sharesDto);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving all shares: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving all shares.");
-        }
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetShareByIdAsync(int id)
     {
-        try
         {
             var share = await _context.Shares
                 .Include(s => s.Post)
@@ -202,17 +177,11 @@ public class SharesController : ControllerBase
 
             return Ok(sharesDto);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving user shares: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the user's shares.");
-        }
     }
 
     [HttpGet("user")]
     public async Task<IActionResult> GetSharesByUser()
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -248,17 +217,11 @@ public class SharesController : ControllerBase
 
             return Ok(sharesDtos);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving user shares: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the user's shares.");
-        }
     }
 
     [HttpGet("getSharesByUserName/{username}")]
     public async Task<IActionResult> GetSharesByUserNameAsync(string username)
     {
-        try
         {
             var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
             if (user == null)
@@ -292,11 +255,6 @@ public class SharesController : ControllerBase
             });
 
             return Ok(sharesDtos);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving shares for username: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving shares for the username.");
         }
     }
 }

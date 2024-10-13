@@ -34,11 +34,12 @@ namespace ArtistryNetAPI.Services
             }
         }
 
-        public async Task<IEnumerable<Share>> GetSharesByUserNameAsync(string username)
+        public async Task<IEnumerable<Share>> GetSharesByUserNameAsync(string userName)
         {
             return await _context.Shares
                 .Include(s => s.User)
-                .Where(s => s.User.UserName == username)
+                .Include(s => s.Post)
+                .Where(s => s.User.UserName == userName)
                 .ToListAsync();
         }
 

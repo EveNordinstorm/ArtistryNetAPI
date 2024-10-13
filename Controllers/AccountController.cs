@@ -182,7 +182,7 @@ public class AccountController : ControllerBase
 
         if (model.BannerPhoto == null)
         {
-            model.BannerPhoto = null; // Set to null if no file uploaded
+            model.BannerPhoto = null;
         }
 
         var result = await _userService.UpdateUserProfileAsync(userId, model);

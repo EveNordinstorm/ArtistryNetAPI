@@ -26,7 +26,6 @@ public class LikesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddLike([FromBody] LikeModel model)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -46,17 +45,11 @@ public class LikesController : ControllerBase
 
             return Ok(new { message = "Like added successfully" });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error adding like: {ex.Message}");
-            return StatusCode(500, "An error occurred while adding the like.");
-        }
     }
 
     [HttpDelete("{postId}")]
     public async Task<IActionResult> RemoveLike(int postId)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -69,17 +62,11 @@ public class LikesController : ControllerBase
 
             return Ok(new { message = "Like removed successfully" });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error removing like: {ex.Message}");
-            return StatusCode(500, "An error occurred while removing the like.");
-        }
     }
 
     [HttpGet("{postId}")]
     public async Task<IActionResult> GetLikesForPost(int postId)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -93,17 +80,11 @@ public class LikesController : ControllerBase
 
             return Ok(new { isLikedByUser });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving likes: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the likes.");
-        }
     }
 
     [HttpGet("user")]
     public async Task<IActionResult> GetUserLikedPosts()
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -132,11 +113,6 @@ public class LikesController : ControllerBase
             });
 
             return Ok(postDtos);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving liked posts: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving liked posts.");
         }
     }
 

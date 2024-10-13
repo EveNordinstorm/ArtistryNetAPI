@@ -26,7 +26,6 @@ public class PostsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreatePost([FromForm] PostModel model, [FromForm] IFormFile? imageUrl)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -65,21 +64,11 @@ public class PostsController : ControllerBase
                 ImageUrl = imageUrlResult
             });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error creating post: {ex.Message}");
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-            }
-            return StatusCode(500, "An error occurred while creating the post.");
-        }
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePost(int id)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -102,17 +91,11 @@ public class PostsController : ControllerBase
 
             return Ok(new { message = "Post deleted successfully." });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error deleting post: {ex.Message}");
-            return StatusCode(500, "An error occurred while deleting the post.");
-        }
     }
 
     [HttpGet]
     public async Task<IActionResult> GetPosts()
     {
-        try
         {
             var posts = await _postService.GetAllPostsAsync();
 
@@ -129,17 +112,11 @@ public class PostsController : ControllerBase
 
             return Ok(postDtos);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving posts: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the posts.");
-        }
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPostById(int id)
     {
-        try
         {
             var post = await _postService.GetPostByIdAsync(id);
             if (post == null) return NotFound();
@@ -157,17 +134,11 @@ public class PostsController : ControllerBase
 
             return Ok(postDto);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving posts: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the posts.");
-        }
     }
 
     [HttpGet("user")]
     public async Task<IActionResult> GetUserPosts()
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -194,21 +165,11 @@ public class PostsController : ControllerBase
 
             return Ok(postDtos);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving user posts: {ex.Message}");
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-            }
-            return StatusCode(500, "An error occurred while retrieving the user's posts.");
-        }
     }
 
     [HttpGet("getPostsByUserName/{username}")]
     public async Task<IActionResult> GetPostsByUserNameAsync(string username)
     {
-        try
         {
             var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
             if (user == null)
@@ -233,11 +194,6 @@ public class PostsController : ControllerBase
             });
 
             return Ok(postDtos);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving posts by username: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the posts.");
         }
     }
 }

@@ -27,7 +27,6 @@ public class ProductsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateProduct([FromForm] ProductModel model, [FromForm] IFormFile imageUrl)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -61,21 +60,11 @@ public class ProductsController : ControllerBase
                 ImageUrl = imageUrlResult
             });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error creating product: {ex.Message}");
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-            }
-            return StatusCode(500, "An error occurred while creating the product.");
-        }
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
             if (userIdFromToken == null)
@@ -98,21 +87,11 @@ public class ProductsController : ControllerBase
 
             return Ok(new { message = "Product deleted successfully" });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error deleting product: {ex.Message}");
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-            }
-            return StatusCode(500, "An error occurred while deleting the product.");
-        }
     }
 
     [HttpGet]
     public async Task<IActionResult> GetProducts()
     {
-        try
         {
             var products = await _productService.GetAllProductsAsync();
 
@@ -129,17 +108,11 @@ public class ProductsController : ControllerBase
 
             return Ok(productDtos);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving products: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the products.");
-        }
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProductByIdAsync(int id)
     {
-        try
         {
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null) return NotFound();
@@ -157,21 +130,11 @@ public class ProductsController : ControllerBase
 
             return Ok(productDto);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving user products: {ex.Message}");
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-            }
-            return StatusCode(500, "An error occurred while retrieving the user's products.");
-        }
     }
 
     [HttpGet("user")]
     public async Task<IActionResult> GetUserProducts()
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -198,21 +161,11 @@ public class ProductsController : ControllerBase
 
             return Ok(productDtos);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving user products: {ex.Message}");
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-            }
-            return StatusCode(500, "An error occurred while retrieving the user's products.");
-        }
     }
 
     [HttpGet("getProductsByUserName/{username}")]
     public async Task<IActionResult> GetProductsByUserNameAsync(string username)
     {
-        try
         {
             var user = await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
             if (user == null)
@@ -237,11 +190,6 @@ public class ProductsController : ControllerBase
             });
 
             return Ok(productDtos);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving products by username: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the products.");
         }
     }
 }                                                                                                 

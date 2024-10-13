@@ -27,7 +27,6 @@ public class SavesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddSave([FromBody] SaveModel model)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -46,17 +45,11 @@ public class SavesController : ControllerBase
 
             return Ok(new { message = "Save added successfully" });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error adding save: {ex.Message}");
-            return StatusCode(500, "An error occurred while adding the save.");
-        }
     }
 
     [HttpDelete("{postId}")]
     public async Task<IActionResult> RemoveSave(int postId)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -69,17 +62,11 @@ public class SavesController : ControllerBase
 
             return Ok(new { message = "Save removed successfully" });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error removing save: {ex.Message}");
-            return StatusCode(500, "An error occurred while removing the save.");
-        }
     }
 
     [HttpGet("{postId}")]
     public async Task<IActionResult> GetSavesForPost(int postId)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -93,17 +80,11 @@ public class SavesController : ControllerBase
 
             return Ok(new { isSavedByUser });
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving saves: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving the saves.");
-        }
     }
 
     [HttpGet("user")]
     public async Task<IActionResult> GetUserSavedPosts()
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -132,11 +113,6 @@ public class SavesController : ControllerBase
             });
 
             return Ok(postDtos);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error retrieving saved posts: {ex.Message}");
-            return StatusCode(500, "An error occurred while retrieving saved posts.");
         }
     }
 }

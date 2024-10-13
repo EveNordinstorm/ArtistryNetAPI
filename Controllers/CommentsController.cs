@@ -23,7 +23,6 @@ public class CommentsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddComment(int postId, [FromBody] CommentModel model)
     {
-        try
         {
             var userIdFromToken = JwtHelper.GetUserIdFromToken(HttpContext);
 
@@ -49,15 +48,6 @@ public class CommentsController : ControllerBase
             await _commentService.AddCommentAsync(comment);
 
             return Ok(new { message = "Comment added successfully" });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error adding comment: {ex.Message}");
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-            }
-            return StatusCode(500, "An error occurred while adding the comment.");
         }
     }
 
