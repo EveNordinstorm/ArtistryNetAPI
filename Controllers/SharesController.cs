@@ -129,7 +129,7 @@ public class SharesController : ControllerBase
                     ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
                     PostDateTime = share.Post.PostDateTime,
                     UserName = share.Post.UserName,
-                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.ProfilePhoto)}"),
                     UserId = share.Post.UserId
                 }
             });
@@ -170,7 +170,7 @@ public class SharesController : ControllerBase
                             : Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
                     PostDateTime = share.Post.PostDateTime,
                     UserName = share.Post.UserName,
-                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.ProfilePhoto)}"),
                     UserId = share.Post.UserId
                 }
             };
@@ -210,7 +210,7 @@ public class SharesController : ControllerBase
                     ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
                     PostDateTime = share.Post.PostDateTime,
                     UserName = share.Post.UserName,
-                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.ProfilePhoto)}"),
                     UserId = share.Post.UserId
                 }
             });
@@ -249,7 +249,7 @@ public class SharesController : ControllerBase
                     ImageUrl = Url.Content($"~/images/posts/{Path.GetFileName(share.Post.ImageUrl)}"),
                     PostDateTime = share.Post.PostDateTime,
                     UserName = share.Post.UserName,
-                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.User?.ProfilePhoto)}"),
+                    ProfilePhoto = Url.Content($"~/images/profiles/{Path.GetFileName(share.Post.ProfilePhoto)}"),
                     UserId = share.Post.UserId
                 }
             });

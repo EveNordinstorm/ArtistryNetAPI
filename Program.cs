@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -19,16 +18,16 @@ var builder = WebApplication.CreateBuilder(args);
 // CORS configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost5173",
+    options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173")
+            policy.WithOrigins("http://localhost:5173", "https://artistrynet.azurewebsites.net")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
 });
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -46,8 +45,6 @@ builder.Services.AddScoped<ISaveService, SaveService>();
 builder.Services.AddScoped<IFollowersService, FollowersService>();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
-
 builder.Services.AddControllers();
 
 // JWT configuration
@@ -74,23 +71,35 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Add SPA static files (for frontend build)
+builder.Services.AddSpaStaticFiles(configuration =>
+{
+    configuration.RootPath = "wwwroot/dist";
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-}
 
 // Middleware configuration
-app.UseCors("AllowLocalhost5173");
-app.UseStaticFiles();
+app.UseHttpsRedirection();
+app.UseStaticFiles(); // Serve static files (wwwroot)
+app.UseSpaStaticFiles(); // Serve SPA static files
+
+app.UseCors("AllowAll");
+
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map API routes
 app.MapControllers();
+
+// Serve the frontend SPA
+app.MapFallbackToFile("dist/index.html");
 
 app.Run();
